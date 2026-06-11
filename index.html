@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Princess ✨</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #0d0d1a;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        /* Hidden YouTube Player */
+        #yt-player {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #music-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 13px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 12px;
+            border-radius: 15px;
+            opacity: 0.7;
+            z-index: 100;
+        }
+
+        /* Screen Sections */
+        .screen {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            position: absolute;
+            animation: fadeIn 1s ease-in-out forwards;
+            z-index: 5;
+        }
+        .active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Typography & Text Animations */
+        h1 {
+            font-size: 2.3rem;
+            color: #ff4d79;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 77, 121, 0.5);
+        }
+        p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            max-width: 600px;
+        }
+        .highlight {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        /* Buttons styling */
+        button {
+            background: linear-gradient(45deg, #ff4d79, #ff758c);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 77, 121, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+            z-index: 10;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 77, 121, 0.6);
+        }
+
+        /* --- CANDLE ANIMATION --- */
+        .cake-container {
+            position: relative;
+            margin-bottom: 40px;
+        }
+        .cake {
+            width: 150px;
+            height: 100px;
+            background: #e056fd;
+            border-radius: 10px 10px 0 0;
+            position: relative;
+            box-shadow: inset 0 10px 0 #be2edd;
+        }
+        .candle {
+            width: 12px;
+            height: 40px;
+            background: linear-gradient(to right, #ffbe08, #ff9100);
+            position: absolute;
+            top: -40px;
+            left: 69px;
+            border-radius: 3px 3px 0 0;
+        }
+        .flame {
+            width: 16px;
+            height: 26px;
+            background: #ff6b6b;
+            border-radius: 50% 50% 20% 20%;
+            position: absolute;
+            top: -30px;
+            left: -2px;
+            background: linear-gradient(to bottom, #ffea00, #ff6b6b);
+            box-shadow: 0 0 15px #ffea00;
+            animation: flicker 0.1s ease-in-out infinite alternate;
+        }
+        @keyframes flicker {
+            0% { transform: scale(1) rotate(-1deg); }
+            100% { transform: scale(1.05) rotate(1deg); }
+        }
+        .flame.blown {
+            display: none;
+        }
+
+        /* --- INTERACTIVE QUESTION BUTTONS --- */
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            position: relative;
+            width: 100%;
+            justify-content: center;
+            height: 100px;
+            align-items: center;
+        }
+        #btn-no {
+            position: absolute;
+            transition: all 0.15s ease-out;
+            background: linear-gradient(45deg, #535c68, #718093);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 20;
+        }
+
+        /* --- FLOATING HEARTS & FIREWORKS --- */
+        .heart {
+            position: absolute;
+            color: #ff4d79;
+            font-size: 20px;
+            animation: floatUp 4s linear infinite;
+            opacity: 0;
+            bottom: -10px;
+            z-index: 1;
+            pointer-events: none;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) translateX(0) scale(0); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-105vh) translateX(var(--randomX)) scale(1.5); opacity: 0; }
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Secret Message Styling */
+        .secret-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 77, 121, 0.3);
+            backdrop-filter: blur(5px);
+            max-width: 550px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Embedded Hidden YouTube Player for Backgroud Music (Khat Song) -->
+    <div id="yt-player"></div>
+    <div id="music-status">🎵 Music Status: Ready</div>
+
+    <!-- Fireworks Canvas Background -->
+    <canvas id="fireworks-canvas"></canvas>
+
+    <!-- STEP 1: CANDLE BLOW & WISH -->
+    <div class="screen active" id="step-1">
+        <h1>Make a Wish & Blow the Candle 🎂</h1>
+        <div class="cake-container">
+            <div class="cake"></div>
+            <div class="candle">
+                <div class="flame" id="candle-flame"></div>
+            </div>
+        </div>
+        <p class="highlight">Aankhein band karo, ek pyaari si wish maango...</p>
+        <button onclick="blowCandle()">Blow Candle 🕯️</button>
+    </div>
+
+    <!-- STEP 2: THE INTERACTIVE QUESTION -->
+    <div class="screen" id="step-2">
+        <h1>Wish me mujhe maanga nhh aapne princess? 🥺</h1>
+        <div class="btn-group">
+            <button id="btn-yes" onclick="answerYes()">Yes</button>
+            <button id="btn-no" onmouseover="moveNoButton()" onclick="moveNoButton()">No</button>
+        </div>
+    </div>
+
+    <!-- STEP 3: THE SECRET MESSAGE & CELEBRATION -->
+    <div class="screen" id="step-3">
+        <div class="secret-box">
+            <h1>🎂 Happy Birthday 🎂</h1>
+            <p>Aaj ka din bahut special hai ✨</p>
+            <p>Main bas itna kehna chahta hu ki tum hamesha khush raho, muskurati raho aur zindagi tumhe har khushi de jo tum deserve karti ho. ❤️</p>
+            <p>Kabhi-kabhi kuch log bina bataye dil ke bahut kareeb aa jaate hain, aur tum unhi mein se ek ho. 🌹</p>
+            <p>Aaj tumhara birthday hai, isliye aaj ke din sirf smiles, happiness aur beautiful memories honi chahiye. 🎈</p>
+            <p>May all your dreams come true and may this year bring lots of success, peace and happiness in your life. ✨</p>
+            <p class="highlight">🎁 A Small Surprise For You 🎁</p>
+            <p style="font-size: 1.5rem; font-weight: bold; color: #ff4d79;">❤️ You Are Special ❤️</p>
+            <p class="highlight">🎂 Happy Birthday Once Again 🎂</p>
+        </div>
+    </div>
+
+    <script>
+        // --- YOUTUBE PLAYER CONFIGURATION ---
+        let player;
+        // Load the IFrame Player API code asynchronously.
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('yt-player', {
+                height: '1',
+                width: '1',
+                videoId: 'LUgpPmj6nR8', // "Khat" Song Video ID
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            document.getElementById('music-status').innerText = "🎵 Music: Ready to play!";
+        }
+
+        function startMusic() {
+            if (player && player.playVideo) {
+                player.playVideo();
+                document.getElementById('music-status').innerText = "🎵 Playing: Khat - Navjot Ahuja";
+            }
+        }
+
+        // Try playing music on any initial click anywhere to tackle strict browser rules
+        document.body.addEventListener('click', () => {
+            startMusic();
+        }, { once: true });
+
+
+        // --- NAVIGATION ---
+        function changeScreen(current, next) {
+            document.getElementById(`step-${current}`).classList.remove('active');
+            document.getElementById(`step-${next}`).classList.add('active');
+        }
+
+        // --- STEP 1: BLOW CANDLE ---
+        function blowCandle() {
+            // Force play music on button click
+            startMusic();
+            
+            // Extinguish flame
+            document.getElementById('candle-flame').classList.add('blown');
+            
+            // Wait for 1.2 seconds for dramatic effect, then move to next page
+            setTimeout(() => {
+                changeScreen(1, 2);
+            }, 1200);
+        }
+
+        // --- STEP 2: INTERACTIVE BUTTONS ---
+        function moveNoButton() {
+            const noBtn = document.getElementById('btn-no');
+            
+            // Boundary restrictions so it doesn't fly off completely out of mobile/web screen view
+            const pad = 80; 
+            const maxX = window.innerWidth - noBtn.offsetWidth - pad;
+            const maxY = window.innerHeight - noBtn.offsetHeight - pad;
+            
+            // Randomly position anywhere on the viewport
+            const randomX = Math.max(pad, Math.random() * maxX);
+            const randomY = Math.max(pad, Math.random() * maxY);
+            
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = `${randomX}px`;
+            noBtn.style.top = `${randomY}px`;
+        }
+
+        function answerYes() {
+            alert("mujhe pta hi tha 😁");
+            changeScreen(2, 3);
+            
+            // Trigger loop effects
+            startHearts();
+            startFireworks();
+        }
+
+        // --- ANIMATIONS: FLOATING HEARTS ---
+        function startHearts() {
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                heart.innerHTML = '❤️';
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.setProperty('--randomX', (Math.random() * 200 - 100) + 'px');
+                heart.style.animationDuration = (Math.random() * 2 + 3) + 's';
+                heart.style.fontSize = (Math.random() * 15 + 15) + 'px';
+                document.body.appendChild(heart);
+
+                setTimeout(() => {
+                    heart.remove();
+                }, 5000);
+            }, 250);
+        }
+
+        // --- ANIMATIONS: FIREWORKS ENGINE ---
+        const canvas = document.getElementById('fireworks-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.radius = Math.random() * 3 + 1;
+                this.velocity = {
+                    x: (Math.random() - 0.5) * 8,
+                    y: (Math.random() - 0.5) * 8
+                };
+                this.alpha = 1;
+                this.decay = Math.random() * 0.015 + 0.015;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+            update() {
+                this.velocity.y += 0.05; // gravity effect
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.alpha -= this.decay;
+            }
+        }
+
+        function createFirework() {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * (canvas.height * 0.6);
+            const colors = ['#ff4d79', '#ffea00', '#00f2fe', '#4facfe', '#ff0844', '#9b51e0'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            for (let i = 0; i < 55; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        function animateFireworks() {
+            requestAnimationFrame(animateFireworks);
+            ctx.fillStyle = 'rgba(13, 13, 26, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach((particle, index) => {
+                if (particle.alpha > 0) {
+                    particle.update();
+                    particle.draw();
+                } else {
+                    particles.splice(index, 1);
+                }
+            });
+        }
+
+        function startFireworks() {
+            animateFireworks();
+            setInterval(createFirework, 700); // loops fireworks
+        }
+    </script>
+</body>
+</html>
